@@ -2,6 +2,7 @@ package edu.illinois.cs.cs125.ddtw;
 
 import android.content.Context;
 import android.content.DialogInterface;
+
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -26,7 +27,25 @@ public class MainActivity extends AppCompatActivity {
     public int maxScore;
     private TextView time;
 
-    final CountDownTimer timer = new CountDownTimer(30000, 1000) {
+    SharedPreferences prefs;
+
+    public Button buttonOne;
+    public Button buttonTwo;
+    public Button buttonThree;
+    public Button buttonFour;
+    public Button buttonFive;
+    public Button buttonSix;
+    public Button buttonSeven;
+    public Button buttonEight;
+    public Button buttonNine;
+    public Button buttonTen;
+    public Button buttonEleven;
+    public Button buttonTwelve;
+
+    public TextView scoreText;
+    public TextView bestScore;
+
+    final CountDownTimer timer = new CountDownTimer(20000, 1000) {
 
         public void onTick(long millisUntilFinished) {
             time.setText("Time: " + millisUntilFinished / 1000);
@@ -44,30 +63,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         time = findViewById(R.id.time);
-
+        scoreText = findViewById(R.id.scoreText);
+        bestScore = findViewById(R.id.bestScore);
 
         Random r = new Random();
         int column1 = (r.nextInt(4) + 1);
         int column2 = (r.nextInt(4) + 1);
         int column3 = (r.nextInt(4) + 1);
 
-        final TextView scoreText = findViewById(R.id.scoreText);
-        final TextView bestScore = findViewById(R.id.bestScore);
-        scoreText.setText("Score: 0");
-        scoreText.setText("Best: " + maxScore);
+        prefs = getSharedPreferences("PREFS", MODE_PRIVATE);
+        maxScore = prefs.getInt("highScore", 0);
 
-        final Button buttonOne = findViewById(R.id.button1);
-        final Button buttonTwo = findViewById(R.id.button2);
-        final Button buttonThree = findViewById(R.id.button3);
-        final Button buttonFour = findViewById(R.id.button4);
-        final Button buttonFive = findViewById(R.id.button5);
-        final Button buttonSix = findViewById(R.id.button6);
-        final Button buttonSeven = findViewById(R.id.button7);
-        final Button buttonEight = findViewById(R.id.button8);
-        final Button buttonNine = findViewById(R.id.button9);
-        final Button buttonTen = findViewById(R.id.button10);
-        final Button buttonEleven = findViewById(R.id.button11);
-        final Button buttonTwelve = findViewById(R.id.button12);
+        scoreText.setText("Score: 0");
+        bestScore.setText("Best: " + maxScore);
+
+        buttonOne = findViewById(R.id.button1);
+        buttonTwo = findViewById(R.id.button2);
+        buttonThree = findViewById(R.id.button3);
+        buttonFour = findViewById(R.id.button4);
+        buttonFive = findViewById(R.id.button5);
+        buttonSix = findViewById(R.id.button6);
+        buttonSeven = findViewById(R.id.button7);
+        buttonEight = findViewById(R.id.button8);
+        buttonNine = findViewById(R.id.button9);
+        buttonTen = findViewById(R.id.button10);
+        buttonEleven = findViewById(R.id.button11);
+        buttonTwelve = findViewById(R.id.button12);
 
         buttonOne.setBackgroundColor(Color.WHITE);
         buttonTwo.setBackgroundColor(Color.WHITE);
@@ -138,11 +159,12 @@ public class MainActivity extends AppCompatActivity {
                     score++;
                     if (score > maxScore) {
                         maxScore = score;
-                        SharedPreferences preferences1 = getSharedPreferences("PREFS", 0);
-                        SharedPreferences.Editor editor = preferences1.edit();
-                        editor.putInt("highScore", maxScore);
                         bestScore.setText("Best: " + maxScore);
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putInt("highScore", maxScore);
                         editor.apply();
+
                     }
                     scoreText.setText("Score: " + score);
 
@@ -252,11 +274,11 @@ public class MainActivity extends AppCompatActivity {
                     score++;
                     if (score > maxScore) {
                         maxScore = score;
-                        SharedPreferences preferences1 = getSharedPreferences("PREFS", 0);
-                        SharedPreferences.Editor editor = preferences1.edit();
+                        bestScore.setText("Best: " + maxScore);
+
+                        SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt("highScore", maxScore);
                         editor.apply();
-                        bestScore.setText("Best: " + maxScore);
                     }
                     scoreText.setText("Score: " + score);
 
@@ -366,11 +388,11 @@ public class MainActivity extends AppCompatActivity {
                     score++;
                     if (score > maxScore) {
                         maxScore = score;
-                        SharedPreferences preferences1 = getSharedPreferences("PREFS", 0);
-                        SharedPreferences.Editor editor = preferences1.edit();
+                        bestScore.setText("Best: " + maxScore);
+
+                        SharedPreferences.Editor editor = prefs.edit();
                         editor.putInt("highScore", maxScore);
                         editor.apply();
-                        bestScore.setText("Best: " + maxScore);
                     }
                     scoreText.setText("Score: " + score);
 
@@ -480,10 +502,10 @@ public class MainActivity extends AppCompatActivity {
                     score++;
                     if (score > maxScore) {
                         maxScore = score;
-                        SharedPreferences preferences1 = getSharedPreferences("PREFS", 0);
-                        SharedPreferences.Editor editor = preferences1.edit();
-                        editor.putInt("highScore", maxScore);
                         bestScore.setText("Best: " + maxScore);
+
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putInt("highScore", maxScore);
                         editor.apply();
                     }
                     scoreText.setText("Score: " + score);
@@ -587,7 +609,20 @@ public class MainActivity extends AppCompatActivity {
                 reset();
             }
         });
-        dlgAlert.setCancelable(true);
+        dlgAlert.setNegativeButton("Reset Best",  new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                maxScore = 0;
+                bestScore.setText("Best: " + maxScore);
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putInt("highScore", maxScore);
+                editor.apply();
+
+                reset();
+            }
+        });
+
+        dlgAlert.setCancelable(false);
         dlgAlert.create().show();
 
     }
@@ -595,7 +630,6 @@ public class MainActivity extends AppCompatActivity {
 
         timer.start();
 
-        final TextView scoreText = findViewById(R.id.scoreText);
         score = 0;
         scoreText.setText("Score: " + score);
 
@@ -604,19 +638,6 @@ public class MainActivity extends AppCompatActivity {
         int column1 = (r.nextInt(4) + 1);
         int column2 = (r.nextInt(4) + 1);
         int column3 = (r.nextInt(4) + 1);
-
-        final Button buttonOne = findViewById(R.id.button1);
-        final Button buttonTwo = findViewById(R.id.button2);
-        final Button buttonThree = findViewById(R.id.button3);
-        final Button buttonFour = findViewById(R.id.button4);
-        final Button buttonFive = findViewById(R.id.button5);
-        final Button buttonSix = findViewById(R.id.button6);
-        final Button buttonSeven = findViewById(R.id.button7);
-        final Button buttonEight = findViewById(R.id.button8);
-        final Button buttonNine = findViewById(R.id.button9);
-        final Button buttonTen = findViewById(R.id.button10);
-        final Button buttonEleven = findViewById(R.id.button11);
-        final Button buttonTwelve = findViewById(R.id.button12);
 
         buttonOne.setBackgroundColor(Color.WHITE);
         buttonTwo.setBackgroundColor(Color.WHITE);
